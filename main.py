@@ -127,6 +127,11 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
     await interaction.response.send_message(embed=embed)
 
+
+
+@tree.command(name="fortnite_stats", description="Gets the fortnite stats of the user", guild=discord.Object(id=724138454979575818))
+async def self(interaction: discord.Interaction,):
+
     
     
 
@@ -137,13 +142,12 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
 #MISC
 
-
 @tree.command(name="botinfo", description="Gives you information about the bot!", guild=discord.Object(id=724138454979575818))
 async def self(interaction: discord.Interaction):
     embed = discord.Embed(title="GameStats+", description="** **", color=3092790)
     embed.add_field(name="Developer", value="ufrz", inline=False)
     embed.add_field(name="Language", value="Python 3.10.4", inline=False)
-    embed.add_field(name="Library", value="discord.py 2.0", inline=False)
+    embed.add_field(name="Library", value="discord.py", inline=False)
     embed.add_field(name="Guild count", value=f"{len(client.guilds)}", inline=False)
     await interaction.response.send_message(embed=embed)
 
