@@ -36,6 +36,22 @@ def statsplit(x):
 
     return split3
 
+def mmrsplit(x):
+    split1 = str(x).split(">")[-2]
+    split2 = split1.split("<")[-2]
+
+    return split2 
+
+def imgsplit(x):
+    split1 = str(x).split("=")[-1]
+    split2 = split1.split(">")[-2]
+    split3 = split2.replace('"', '')
+    split4 = split3.rstrip('/')
+
+    return split4
+
+
+
 
 # stats
 
@@ -82,6 +98,35 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
     await interaction.response.send_message(embed=embed)
 
+
+@tree.command(name="r6_ranked_stats", description="Gives the ranked stats of the users Rainbow Six Seige profile", guild=discord.Object(id=724138454979575818))
+async def self(interaction: discord.Interaction, platform: str, username: str):
+    r = requests.get(f"https://r6.tracker.network/profile/{platform}/{username}")
+    userPage = BeautifulSoup(r.text, 'html.parser')
+    mmr = userPage.find('div', {'style': 'font-family: Rajdhani; font-size: 3rem;'})
+    best_mmr = mmrsplit(mmr)
+
+    mmr_pic = userPage.find('image', {'width': '56'})
+    picture = imgsplit(mmr_pic)
+
+    rankedKD = userPage.find('div', {'data-stat': 'RankedKDRatio'})
+    kd = statsplit(rankedKD)
+
+    rankedWins = userPage.find('div', {'data-stat': 'RankedWins'})
+    wins = statsplit(rankedWins)
+
+    rankedWinRate = userPage.find('div', {'data-stat': 'RankedWLRatio'})
+    win_rate = statsplit(rankedWinRate)
+
+    embed = discord.Embed(title=f"{username}'s ranked stats", description="** **", color=3092790)
+    embed.add_field(name="Current season MMR", value=best_mmr, inline=False)
+    embed.add_field(name="All Time Ranked KD", value=kd, inline=False)
+    embed.add_field(name="All Time Ranked Wins", value=wins, inline=False)
+    embed.add_field(name="All Time Ranked Win Rate", value=win_rate, inline=False)
+    embed.set_thumbnail(url=picture)
+
+    await interaction.response.send_message(embed=embed)
+
     
     
 
@@ -95,12 +140,17 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
 @tree.command(name="botinfo", description="Gives you information about the bot!", guild=discord.Object(id=724138454979575818))
 async def self(interaction: discord.Interaction):
-    embed = discord.Embed(title="Nov is the name!", description="** **", color=3092790)
+    embed = discord.Embed(title="GameStats+", description="** **", color=3092790)
     embed.add_field(name="Developer", value="ufrz", inline=False)
     embed.add_field(name="Language", value="Python 3.10.4", inline=False)
     embed.add_field(name="Library", value="discord.py 2.0", inline=False)
     embed.add_field(name="Guild count", value=f"{len(client.guilds)}", inline=False)
     await interaction.response.send_message(embed=embed)
+
+
+
+
+
 
 
 
