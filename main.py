@@ -29,6 +29,14 @@ client = abot()
 tree = app_commands.CommandTree(client)
 
 
+def statsplit(x):
+    split1 = str(x).split("<")[-2]
+    split2 = split1.split(" ")[-1]
+    split3 = split2.split(">")[-1]
+
+    return split3
+
+
 # stats
 
 @tree.command(name="osu_stats", description="Gives you stats on an osu user", guild=discord.Object(id=724138454979575818))
@@ -51,16 +59,31 @@ async def self(interaction: discord.Interaction, username: str):
 
 
 @tree.command(name="r6_stats", description="Gives the stats of someones Rainbow Six Seige Profile", guild=discord.Object(id=724138454979575818))
-async def self(interaction: discord.Interaction):
-    r = requests.get("https://r6.tracker.network/profile/xbox/tbzq")
+async def self(interaction: discord.Interaction, platform: str, username: str):
+    r = requests.get(f"https://r6.tracker.network/profile/{platform}/{username}")
     userPage = BeautifulSoup(r.text, 'html.parser')
     kd = userPage.find('div', {'data-stat': 'PVPKDRatio'})
-    mod_kd = str(kd).split("<")[-2]
-    best_kd = mod_kd.split(" ")[-1]
-    kd2 = best_kd.split(">")[-1]
+    kdd = statsplit(kd)
+    wr = userPage.find('div', {'data-stat': 'PVPWLRatio'})
+    wrr = statsplit(wr)
+    kills = userPage.find('div', {'data-stat': 'PVPKills'})
+    killls = statsplit(kills)
+    wins = userPage.find('div', {'data-stat': 'PVPMatchesWon'})
+    winss = statsplit(wins)
+    timePlayed = userPage.find('div', {'data-stat': 'PVPTimePlayed'})
+    timePlayedd = statsplit(timePlayed)
 
+    embed = discord.Embed(title=f"{username}'s all time stats", description="** **", color=3092790)
+    embed.add_field(name="KD", value=kdd)
+    embed.add_field(name="Win Rate", value=wrr, inline=False)
+    embed.add_field(name="Kills", value=killls)
+    embed.add_field(name="Wins", value=winss, inline=False)
+    embed.add_field(name="Time Played", value=timePlayedd)
 
-    await interaction.response.send_message(kd2)
+    await interaction.response.send_message(embed=embed)
+
+    
+    
 
     
 
@@ -82,4 +105,4 @@ async def self(interaction: discord.Interaction):
 
 
 
-client.run("token")
+client.run("MTEyNTMwMjAxODc5NDMyODA2NA.Gg-tYM.py7_ybvMxectpu1_A57FfRnj9jfYQpnhg8YaPI")
