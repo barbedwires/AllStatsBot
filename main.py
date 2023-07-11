@@ -53,7 +53,59 @@ def imgsplit(x):
 
 
 
+# help commands
+
+
+@tree.command(name="help", description="Displays the list of commands that are currently available", guild=discord.Object(id=724138454979575818))
+async def self(interaction:discord.Interaction):
+    embed = discord.Embed(title="Command list", description="** **", color=3092790)
+
+    embed.add_field(name="/games_supported", value="Displays the games that GameStats+ can be used for")
+    embed.add_field(name="/help_valorant", value="Displays the current commands for valorant")
+    embed.add_field(name="/help_osu", value="Displays the current commands for osu!")
+    embed.add_field(name="/help_r6", value="Displays the current commands for Rainbow Six Siege")
+
+
+    await interaction.response.send_message(embed=embed)
+
+
+
+@tree.command(name="help_valorant", description="Displays the current commands for valorant", guild=discord.Object(id=724138454979575818))
+async def self(interaction:discord.Interaction):
+    embed = discord.Embed(title="Current Valorant commands", description="** **", color=discord.Color.red())
+
+    embed.add_field(name="/valorant_stats", value="Displays the current ranked stats for the user")
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name="help_r6", description="Displays the current commands for Rainbow Six Siege", guild=discord.Object(id=724138454979575818))
+async def self(interaction:discord.Interaction):
+    embed = discord.Embed(title="List of commands for Rainbow Six Siege", description="** **",)
+
+    embed.add_field(name="/r6_stats", value="Displays the lifetime stats for the user")
+    embed.add_field(name="/r6_ranked_stats", value="Displays the ranked stats for the user")
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name="help_osu", description="Displays the current commands for osu!", guild=discord.Object(id=724138454979575818))
+async def self(interaction:discord.Interaction):
+    embed = discord.Embed(title="Current osu! commands", description="** **", color=discord.Color.pink())
+
+    embed.add_field(name="/osu_stats", value="Displays the stats for  the user")
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name="games_supported", description="List of games that are currently supported.", guild=discord.Object(id=724138454979575818))
+async def self(interaction:discord.Interaction):
+    await interaction.response.send_message("Games currently supported: osu!, R6, and Valorant")
+
+
 # stats
+
+# OSU!
 
 @tree.command(name="osu_stats", description="Gives you stats on an osu user", guild=discord.Object(id=724138454979575818))
 async def self(interaction: discord.Interaction, username: str):
@@ -63,7 +115,7 @@ async def self(interaction: discord.Interaction, username: str):
     stats = r.json()
     seconds_played = int(stats[0]['total_seconds_played'])
     hours_played = (datetime.timedelta(seconds=seconds_played))
-    embed = discord.Embed(title=f"{username}'s stats", description="** **", color=3092790)
+    embed = discord.Embed(title=f"{username}'s stats", description="** **", color=discord.Color.pink())
     embed.add_field(name="PP rank", value=stats[0]['pp_rank'], inline=False)
     embed.add_field(name="Accuracy", value=stats[0]['accuracy'], inline=False)
     embed.add_field(name="Sign up Date", value=stats[0]['join_date'], inline=False)
@@ -72,7 +124,7 @@ async def self(interaction: discord.Interaction, username: str):
 
     await interaction.response.send_message(embed=embed)
 
-
+# RAINBOW SIX
 
 @tree.command(name="r6_stats", description="Gives the stats of someones Rainbow Six Seige Profile", guild=discord.Object(id=724138454979575818))
 async def self(interaction: discord.Interaction, platform: str, username: str):
@@ -127,7 +179,7 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
     await interaction.response.send_message(embed=embed)
 
-
+# valorant 
 
 @tree.command(name="valorant_stats", description="Retreive the comp stats for the user", guild=discord.Object(id=724138454979575818))
 async def self(interaction: discord.Interaction, username:str, riot_id:str):
@@ -143,10 +195,13 @@ async def self(interaction: discord.Interaction, username:str, riot_id:str):
 
 
 
-    embed = discord.Embed(title=f"Valorant Stats for {username}#{riot_id} for the current episode", description="** **", color=3092790)
-    embed.add_field(name="Current RR", value=best_mmr, inline=False)
-    embed.add_field(name="Comp Win Rate", value=winRate.text, inline=False)
+    embed = discord.Embed(title=f"Valorant Stats for {username}#{riot_id} for the current episode", description="** **", color=discord.Color.red())
+    embed.add_field(name="Current RR", value=best_mmr)
+    embed.add_field(name="Comp Win Rate", value=winRate.text)
     embed.add_field(name="Comp Wins", value=test[7].text)
+    embed.add_field(name="Comp Kills", value=test[10].text)
+
+
 
     await interaction.response.send_message(embed=embed)
 
@@ -155,9 +210,6 @@ async def self(interaction: discord.Interaction, username:str, riot_id:str):
     
     
 
-    
-
-    
 
 
 #MISC
@@ -165,10 +217,11 @@ async def self(interaction: discord.Interaction, username:str, riot_id:str):
 @tree.command(name="botinfo", description="Gives you information about the bot!", guild=discord.Object(id=724138454979575818))
 async def self(interaction: discord.Interaction):
     embed = discord.Embed(title="GameStats+", description="** **", color=3092790)
-    embed.add_field(name="Developer", value="ufrz", inline=False)
-    embed.add_field(name="Language", value="Python 3.10.4", inline=False)
-    embed.add_field(name="Library", value="discord.py", inline=False)
-    embed.add_field(name="Guild count", value=f"{len(client.guilds)}", inline=False)
+    embed.add_field(name="Developer", value="ufrz")
+    embed.add_field(name="Language", value="Python 3.10.4")
+    embed.add_field(name="Library", value="discord.py")
+    embed.add_field(name="Guild count", value=f"{len(client.guilds)}")
+    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/690417132055298089/1128438700343304243/IMG_5967.png")
     await interaction.response.send_message(embed=embed)
 
 
