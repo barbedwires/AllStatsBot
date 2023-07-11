@@ -129,8 +129,28 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
 
 
-@tree.command(name="fortnite_stats", description="Gets the fortnite stats of the user", guild=discord.Object(id=724138454979575818))
-async def self(interaction: discord.Interaction,):
+@tree.command(name="valorant_stats", description="Retreive the comp stats for the user", guild=discord.Object(id=724138454979575818))
+async def self(interaction: discord.Interaction, username:str, riot_id:str):
+    r = requests.get(f"https://tracker.gg/valorant/profile/riot/curry%2366666/overview")
+
+    userPage = BeautifulSoup(r.text, 'html.parser')
+    mmr = userPage.find('span', {'class': 'stat__value'})
+    best_mmr = mmr.text
+
+    test = userPage.find_all('span', {'class': 'value'})
+    print(test)
+    winRate = test[6]
+
+
+
+    embed = discord.Embed(title=f"Valorant Stats for {username}#{riot_id} for the current episode", description="** **", color=3092790)
+    embed.add_field(name="Current RR", value=best_mmr, inline=False)
+    embed.add_field(name="Comp Win Rate", value=winRate.text, inline=False)
+    embed.add_field(name="Comp Wins", value=test[7].text)
+
+    await interaction.response.send_message(embed=embed)
+
+    
 
     
     
@@ -154,9 +174,5 @@ async def self(interaction: discord.Interaction):
 
 
 
-
-
-
-
-
-client.run("token")
+client.run("MTEyNTMwMjAxODc5NDMyODA2NA.GDbrQj.COAuplnop5GRq5LvV9JUVk_gW_3vnD5oMhARzI")
+    
