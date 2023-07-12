@@ -206,9 +206,16 @@ async def self(interaction: discord.Interaction, username:str, riot_id:str):
     await interaction.response.send_message(embed=embed)
 
     
+# CS:GO
 
-    
-    
+@tree.command(name="cs_stats", description="gets the csgo stats for the user", guild=discord.Object(id=724138454979575818))
+async def self(interaction:discord.Interaction, steamID:str):
+    r = requests.get(f"https://tracker.gg/csgo/profile/steam/{steamID}/overview")
+    userPage = BeautifulSoup(r.text, 'html.parser')
+    classes = userPage.find_all('span', {'class': 'value'})
+
+
+
 
 
 
