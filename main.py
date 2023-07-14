@@ -183,23 +183,29 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
 @tree.command(name="valorant_stats", description="Retreive the comp stats for the user", guild=discord.Object(id=724138454979575818))
 async def self(interaction: discord.Interaction, username:str, riot_id:str):
-    r = requests.get(f"https://tracker.gg/valorant/profile/riot/curry%2366666/overview")
+    r = requests.get(f"https://tracker.gg/valorant/profile/riot/{username}%23{riot_id}/overview")
 
     userPage = BeautifulSoup(r.text, 'html.parser')
     mmr = userPage.find('span', {'class': 'stat__value'})
     best_mmr = mmr.text
 
     test = userPage.find_all('span', {'class': 'value'})
-    print(test)
+
     winRate = test[6]
 
+    rr = requests.get(f'https://tracker.gg/valorant/profile/riot/{username}%23{riot_id}/agents')
+    agentPage = BeautifulSoup(rr.text, 'html.parser')
+    agentLocate = agentPage.find_all('div', {'class': 'value'})
 
+    agentPicture = agentPage.find_all('img', {'data-v-0c313880': ''})
+    print(agentPicture)
 
     embed = discord.Embed(title=f"Valorant Stats for {username}#{riot_id} for the current episode", description="** **", color=discord.Color.red())
     embed.add_field(name="Current RR", value=best_mmr)
     embed.add_field(name="Comp Win Rate", value=winRate.text)
     embed.add_field(name="Comp Wins", value=test[7].text)
     embed.add_field(name="Comp Kills", value=test[10].text)
+    embed.add_field(name="Most played Comp Legend", value=agentLocate[0].text)
 
 
 
@@ -208,11 +214,65 @@ async def self(interaction: discord.Interaction, username:str, riot_id:str):
     
 # CS:GO
 
-@tree.command(name="cs_stats", description="gets the csgo stats for the user", guild=discord.Object(id=724138454979575818))
-async def self(interaction:discord.Interaction, steamID:str):
-    r = requests.get(f"https://tracker.gg/csgo/profile/steam/{steamID}/overview")
+@tree.command(name="counter_strike_stats", description="gets the csgo stats for the user", guild=discord.Object(id=724138454979575818))
+async def self(interaction:discord.Interaction, steamid:str):
+    r = requests.get(f"https://tracker.gg/csgo/profile/steam/{steamid}/overview")
     userPage = BeautifulSoup(r.text, 'html.parser')
     classes = userPage.find_all('span', {'class': 'value'})
+
+    username = userPage.find('span', {'class': 'trn-ign__username'})
+    print(username.text)
+
+    print(classes)
+
+    embed = discord.Embed(title=f"{username.text}'s stats", description="** **", color=discord.Color.orange())
+    embed.add_field(name="KD", value=classes[0].text)
+    embed.add_field(name="Win Rate", value=classes[2].text)
+    embed.add_field(name="Kills", value=classes[4].text)
+
+    await interaction.response.send_message(embed=embed)
+
+
+
+# APEX LEGENDS
+
+
+@tree.command(name="apex_legends_stats", description="Gives stats for the user", guild=discord.Object(id=724138454979575818))
+async def self(interaction:discord.Interaction, username:str):
+    r = requests.get(f"https://apex.tracker.gg/apex/profile/origin/{username}/overview")
+    userPage = BeautifulSoup(r.text, 'html.parser')
+
+    classes = userPage.find_all('span', {'class': 'value'})
+
+    mmr = userPage.find('span', {'class': 'mmr'})
+    level = classes[0].text
+    kills = classes[1].text
+
+    lgnd_name = userPage.find_all('div', {'class': 'legend__name'})
+    most_played_character = lgnd_name[0].text
+
+    character_pic = userPage.find_all('img', {'class': 'legend__portrait'})
+    org = str(character_pic[0])
+    new_org = org.split("=")[-2]
+    neww_org = new_org.replace('style', '')
+    character_picture = neww_org.replace('"', '')
+    print(new_org)
+    print(neww_org)
+    print(character_picture)
+
+    embed = discord.Embed(title=f"Stats for {username}", description="** **", color=discord.Color.red())
+    embed.add_field(name="MMR", value=mmr.text)
+    embed.add_field(name="Level", value=level)
+    embed.add_field(name="Kills", value=kills)
+    embed.add_field(name="Most played character", value=most_played_character)
+    embed.set_thumbnail(url=character_picture)
+
+    await interaction.response.send_message(embed=embed)
+
+
+
+
+    
 
 
 
