@@ -294,5 +294,5 @@ async def self(interaction: discord.Interaction):
 
 
 
-client.run("MTEyNTMwMjAxODc5NDMyODA2NA.GDbrQj.COAuplnop5GRq5LvV9JUVk_gW_3vnD5oMhARzI")
+client.run("token")
     
