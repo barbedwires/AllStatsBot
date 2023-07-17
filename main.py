@@ -14,19 +14,21 @@ client = commands.Bot(intents=INTENTS, command_prefix=PREFIX)
 client.remove_command('help')
 
 
-class abot(discord.Client):
-    def __init__(self):
-        super().__init__(intents=INTENTS)
-        self.synced = False
-    
-    async def on_ready(self):
-        await tree.sync(guild=discord.Object(id=724138454979575818))
-        self.synced = True
-        print("Bot is online!")
+
+async def on_ready(self):
+    print("Bot is online!")
 
 
-client = abot()
-tree = app_commands.CommandTree(client)
+async def on_guild_join(self):
+    await client.tree.sync()
+    print("Commands have been synced for the new server")
+
+
+BRAWLHALLA_API_KEY="HG07BT96HEZTH1G3B7RW"
+
+
+
+
 
 
 def statsplit(x):
@@ -56,7 +58,16 @@ def imgsplit(x):
 # help commands
 
 
-@tree.command(name="help", description="Displays the list of commands that are currently available", guild=discord.Object(id=724138454979575818))
+@client.command()
+async def sync(ctx):
+    print("sync command")
+    if ctx.author.id == 325837218222440460:
+        await client.tree.sync()
+        await ctx.send(f"Synced commands to the the servers!")
+    else:
+        await ctx.send('You must be the owner to use this command!')
+
+@client.tree.command(name="help", description="Displays the list of commands that are currently available")
 async def self(interaction:discord.Interaction):
     embed = discord.Embed(title="Command list", description="** **", color=3092790)
 
@@ -64,13 +75,16 @@ async def self(interaction:discord.Interaction):
     embed.add_field(name="/help_valorant", value="Displays the current commands for valorant")
     embed.add_field(name="/help_osu", value="Displays the current commands for osu!")
     embed.add_field(name="/help_r6", value="Displays the current commands for Rainbow Six Siege")
+    embed.add_field(name="/help_apex", value="Displays the current commands for apex legends")
+    embed.add_field(name="/help_csgo", value="Displays the current commands for csgo")
+    embed.add_field(name="/help_misc", value="Displays the misc commands for GameStats+")
 
 
     await interaction.response.send_message(embed=embed)
 
 
 
-@tree.command(name="help_valorant", description="Displays the current commands for valorant", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="help_valorant", description="Displays the current commands for valorant")
 async def self(interaction:discord.Interaction):
     embed = discord.Embed(title="Current Valorant commands", description="** **", color=discord.Color.red())
 
@@ -79,7 +93,7 @@ async def self(interaction:discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name="help_r6", description="Displays the current commands for Rainbow Six Siege", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="help_r6", description="Displays the current commands for Rainbow Six Siege")
 async def self(interaction:discord.Interaction):
     embed = discord.Embed(title="List of commands for Rainbow Six Siege", description="** **",)
 
@@ -89,7 +103,7 @@ async def self(interaction:discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name="help_osu", description="Displays the current commands for osu!", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="help_osu", description="Displays the current commands for osu!")
 async def self(interaction:discord.Interaction):
     embed = discord.Embed(title="Current osu! commands", description="** **", color=discord.Color.pink())
 
@@ -98,16 +112,37 @@ async def self(interaction:discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name="games_supported", description="List of games that are currently supported.", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="help_csgo", description="Displays the current commands for csgo")
 async def self(interaction:discord.Interaction):
-    await interaction.response.send_message("Games currently supported: osu!, R6, and Valorant")
+    embed = discord.Embed(title="Current csgo commands", description="** **", color=discord.Color.orange())
+
+    embed.add_field(name="/counter_strike_stats", value="Displays the csgo stats for the user")
+
+    await interaction.response.send_message(embed=embed)
+
+
+@client.tree.command(name="help_apex", description="Displays the current commands for apex legends")
+async def self(interaction:discord.Interaction):
+    embed = discord.Embed(title="Current csgo commands", description="** **", color=discord.Color.red())
+
+    embed.add_field(name="/apex_legend_stats", value="Displays the apex legend stats for the user")
+
+    await interaction.response.send_message(embed=embed)
+
+
+@client.tree.command(name="games_supported", description="List of games that are currently supported.")
+async def self(interaction:discord.Interaction):
+    await interaction.response.send_message("Games currently supported: osu!, R6, Valorant, Apex Legends, and CS:GO")
 
 
 # stats
 
+
+
+
 # OSU!
 
-@tree.command(name="osu_stats", description="Gives you stats on an osu user", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="osu_stats", description="Gives you stats on an osu user")
 async def self(interaction: discord.Interaction, username: str):
     baseUrl = 'https://osu.ppy.sh/api/{}?k=e7842270927e45016fef5cbe4ed44c3fe2c96440'
     url = baseUrl.format("get_user") + "&u=" + username
@@ -126,7 +161,7 @@ async def self(interaction: discord.Interaction, username: str):
 
 # RAINBOW SIX
 
-@tree.command(name="r6_stats", description="Gives the stats of someones Rainbow Six Seige Profile", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="r6_stats", description="Gives the stats of someones Rainbow Six Seige Profile")
 async def self(interaction: discord.Interaction, platform: str, username: str):
     r = requests.get(f"https://r6.tracker.network/profile/{platform}/{username}")
     userPage = BeautifulSoup(r.text, 'html.parser')
@@ -150,8 +185,7 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
     await interaction.response.send_message(embed=embed)
 
-
-@tree.command(name="r6_ranked_stats", description="Gives the ranked stats of the users Rainbow Six Seige profile", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="r6_ranked_stats", description="Gives the ranked stats of the users Rainbow Six Seige profile")
 async def self(interaction: discord.Interaction, platform: str, username: str):
     r = requests.get(f"https://r6.tracker.network/profile/{platform}/{username}")
     userPage = BeautifulSoup(r.text, 'html.parser')
@@ -181,13 +215,18 @@ async def self(interaction: discord.Interaction, platform: str, username: str):
 
 # valorant 
 
-@tree.command(name="valorant_stats", description="Retreive the comp stats for the user", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="valorant_stats", description="Retreive the comp stats for the user")
 async def self(interaction: discord.Interaction, username:str, riot_id:str):
+    if " " in username:
+        username = username.replace(' ', '%20')
+
     r = requests.get(f"https://tracker.gg/valorant/profile/riot/{username}%23{riot_id}/overview")
 
     userPage = BeautifulSoup(r.text, 'html.parser')
     mmr = userPage.find('span', {'class': 'stat__value'})
+    print(mmr)
     best_mmr = mmr.text
+    print(best_mmr)
 
     test = userPage.find_all('span', {'class': 'value'})
 
@@ -196,16 +235,66 @@ async def self(interaction: discord.Interaction, username:str, riot_id:str):
     rr = requests.get(f'https://tracker.gg/valorant/profile/riot/{username}%23{riot_id}/agents')
     agentPage = BeautifulSoup(rr.text, 'html.parser')
     agentLocate = agentPage.find_all('div', {'class': 'value'})
+    most_played_character = str(agentLocate[0].text)
 
     agentPicture = agentPage.find_all('img', {'data-v-0c313880': ''})
-    print(agentPicture)
+    print(agentPicture[4])
+    picture = agentPicture[4]
+    new_pic = str(picture).replace('<img data-v-0c313880="" src=', '')
+    real_pic = new_pic.replace('"', '')
+    legend_picture = real_pic.replace('/>', '')
 
-    embed = discord.Embed(title=f"Valorant Stats for {username}#{riot_id} for the current episode", description="** **", color=discord.Color.red())
+
+    
+    if most_played_character == "Skye":
+        colorr = discord.Color.green()
+    elif most_played_character == "Killjoy":
+        colorr = discord.Color.yellow()
+    elif most_played_character == "Cypher":
+        colorr = discord.Color.from_rgb(255, 255, 255)
+    elif most_played_character == "Sova":
+        colorr = discord.Color.blue()
+    elif most_played_character == "Astra":
+        colorr = discord.Color.purple()
+    elif most_played_character == "BrimStone":
+        colorr = discord.Color.dark_orange()
+    elif most_played_character == "Raze":
+        colorr = discord.Color.orange()
+    elif most_played_character == "Viper":
+        colorr = discord.Color.green()
+    elif most_played_character == "Breach":
+        colorr = discord.Color.orange()
+    elif most_played_character == "Omen":
+        colorr = discord.Color.purple()
+    elif most_played_character == "Reyna":
+        colorr = discord.Color.pink()
+    elif most_played_character == "Jett":
+        colorr = discord.Color.blue()
+    elif most_played_character == "Phoenix":
+        colorr = discord.Color.orange()
+    elif most_played_character == "KAY/O":
+        colorr = discord.Color.purple()
+    elif most_played_character == "Gekko":
+        colorr = discord.Color.green()
+    elif most_played_character == "Harbor":
+        colorr = discord.Color.dark_blue()
+    elif most_played_character == "Deadlock":
+        colorr = discord.Color.from_rgb(255, 255, 255)
+    elif most_played_character == "Chamber":
+        colorr = discord.Color.gold()
+    elif most_played_character == "Sage":
+        colorr = discord.Color.green()
+
+
+
+
+    embed = discord.Embed(title=f"Valorant Stats for {username.replace('%20', ' ')}#{riot_id} for the current episode", description="** **", color=colorr)
     embed.add_field(name="Current RR", value=best_mmr)
     embed.add_field(name="Comp Win Rate", value=winRate.text)
     embed.add_field(name="Comp Wins", value=test[7].text)
     embed.add_field(name="Comp Kills", value=test[10].text)
-    embed.add_field(name="Most played Comp Legend", value=agentLocate[0].text)
+    embed.add_field(name="Most played Comp Legend", value=most_played_character)
+    embed.set_thumbnail(url=legend_picture)
 
 
 
@@ -214,16 +303,15 @@ async def self(interaction: discord.Interaction, username:str, riot_id:str):
     
 # CS:GO
 
-@tree.command(name="counter_strike_stats", description="gets the csgo stats for the user", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="counter_strike_stats", description="gets the csgo stats for the user")
 async def self(interaction:discord.Interaction, steamid:str):
     r = requests.get(f"https://tracker.gg/csgo/profile/steam/{steamid}/overview")
     userPage = BeautifulSoup(r.text, 'html.parser')
     classes = userPage.find_all('span', {'class': 'value'})
 
     username = userPage.find('span', {'class': 'trn-ign__username'})
-    print(username.text)
 
-    print(classes)
+
 
     embed = discord.Embed(title=f"{username.text}'s stats", description="** **", color=discord.Color.orange())
     embed.add_field(name="KD", value=classes[0].text)
@@ -237,7 +325,7 @@ async def self(interaction:discord.Interaction, steamid:str):
 # APEX LEGENDS
 
 
-@tree.command(name="apex_legends_stats", description="Gives stats for the user", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="apex_legends_stats", description="Gives stats for the user")
 async def self(interaction:discord.Interaction, username:str):
     r = requests.get(f"https://apex.tracker.gg/apex/profile/origin/{username}/overview")
     userPage = BeautifulSoup(r.text, 'html.parser')
@@ -249,16 +337,16 @@ async def self(interaction:discord.Interaction, username:str):
     kills = classes[1].text
 
     lgnd_name = userPage.find_all('div', {'class': 'legend__name'})
-    most_played_character = lgnd_name[0].text
+    most_played_character = str(lgnd_name[0].text)
 
     character_pic = userPage.find_all('img', {'class': 'legend__portrait'})
     org = str(character_pic[0])
     new_org = org.split("=")[-2]
     neww_org = new_org.replace('style', '')
     character_picture = neww_org.replace('"', '')
-    print(new_org)
-    print(neww_org)
-    print(character_picture)
+
+
+
 
     embed = discord.Embed(title=f"Stats for {username}", description="** **", color=discord.Color.red())
     embed.add_field(name="MMR", value=mmr.text)
@@ -272,18 +360,15 @@ async def self(interaction:discord.Interaction, username:str):
 
 
 
-    
-
-
-
+# 
 
 
 
 #MISC
 
-@tree.command(name="botinfo", description="Gives you information about the bot!", guild=discord.Object(id=724138454979575818))
+@client.tree.command(name="botinfo", description="Gives you information about the bot!")
 async def self(interaction: discord.Interaction):
-    embed = discord.Embed(title="GameStats+", description="** **", color=3092790)
+    embed = discord.Embed(title="GameStats+", description="** **", color=discord.Color.from_rgb(255, 255, 255))
     embed.add_field(name="Developer", value="ufrz")
     embed.add_field(name="Language", value="Python 3.10.4")
     embed.add_field(name="Library", value="discord.py")
@@ -292,7 +377,15 @@ async def self(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
+@client.tree.command(name="bot_invite", description="Sends the link that allows you to add the bot to another server!")
+async def self(interaction:discord.Interaction):
+    embed = discord.Embed(title="GameStats+ Invite!",description="** **", color=3092790)
+    embed.add_field(name="Server Invite", value="Click [Here](https://discord.gg/RBPMxAnqWv)")
+
+    await interaction.response.send_message(embed=embed)
 
 
-client.run("token")
+
+
+client.run("")
     
