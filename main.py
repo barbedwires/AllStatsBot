@@ -24,7 +24,6 @@ async def on_guild_join(self):
     print("Commands have been synced for the new server")
 
 
-BRAWLHALLA_API_KEY="HG07BT96HEZTH1G3B7RW"
 
 
 
@@ -363,28 +362,7 @@ async def self(interaction:discord.Interaction, username:str):
 # 
 
 
-
-#MISC
-
-@client.tree.command(name="botinfo", description="Gives you information about the bot!")
-async def self(interaction: discord.Interaction):
-    embed = discord.Embed(title="GameStats+", description="** **", color=discord.Color.from_rgb(255, 255, 255))
-    embed.add_field(name="Developer", value="ufrz")
-    embed.add_field(name="Language", value="Python 3.10.4")
-    embed.add_field(name="Library", value="discord.py")
-    embed.add_field(name="Guild count", value=f"{len(client.guilds)}")
-    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/690417132055298089/1128438700343304243/IMG_5967.png")
-    await interaction.response.send_message(embed=embed)
-
-
-@client.tree.command(name="bot_invite", description="Sends the link that allows you to add the bot to another server!")
-async def self(interaction:discord.Interaction):
-    embed = discord.Embed(title="GameStats+ Invite!",description="** **", color=3092790)
-    embed.add_field(name="Server Invite", value="Click [Here](https://discord.gg/RBPMxAnqWv)")
-
-    await interaction.response.send_message(embed=embed)
-
-
+ufrz made this :)
 
 
 client.run("")
