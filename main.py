@@ -60,7 +60,7 @@ def imgsplit(x):
 @client.command()
 async def sync(ctx):
     print("sync command")
-    if ctx.author.id == 325837218222440460:
+    if ctx.author.id == your_id:
         await client.tree.sync()
         await ctx.send(f"Synced commands to the the servers!")
     else:
@@ -365,5 +365,5 @@ async def self(interaction:discord.Interaction, username:str):
 ufrz made this :)
 
 
-client.run("")
+
     
