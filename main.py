@@ -359,10 +359,6 @@ async def self(interaction:discord.Interaction, username:str):
 
 
 
-# 
-
-
-ufrz made this :)
 
 
 
